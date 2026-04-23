@@ -1,0 +1,21 @@
+{
+	"ver": 1,
+	"name": "Sidebar Calendar",
+	"icon": "calendar",
+	"item_name": "Event",
+	"description": "Mini calendar in the sidebar",
+	"show_sidebar_items": false,
+	"show_cmdpal_items": false,
+	"views": [],
+	"fields": [],
+	"page_field_ids": [],
+	"sidebar_record_sort_field_id": "",
+	"sidebar_record_sort_dir": "asc",
+	"managed": {
+		"fields": true,
+		"views": true,
+		"sidebar": true
+	},
+	"custom": {},
+	"home": false
+}
