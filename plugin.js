@@ -65,12 +65,12 @@ class Plugin extends AppPlugin {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 10px;
+        margin-bottom: 6px; /* was 12px */
         gap: 4px;
       }
       .scal-month-label {
-        font-size: clamp(11px, 3cqw, 14px);
-        font-weight: 600;
+        font-size: clamp(14px, 4cqw, 18px);
+        font-weight: 700;
         color: var(--color-text-primary);
         letter-spacing: 0.02em;
         text-align: center;
@@ -83,7 +83,7 @@ class Plugin extends AppPlugin {
         background: none;
         border: none;
         cursor: pointer;
-        padding: 3px 6px;
+        padding: 4px 8px;
         border-radius: 4px;
         color: var(--color-text-secondary);
         display: flex;
@@ -91,7 +91,7 @@ class Plugin extends AppPlugin {
         justify-content: center;
         line-height: 1;
         flex-shrink: 0;
-        font-size: clamp(13px, 3cqw, 16px);
+        font-size: clamp(16px, 4cqw, 20px);
         transition: background 0.12s, color 0.12s;
       }
       .scal-nav-btn:hover {
@@ -104,30 +104,32 @@ class Plugin extends AppPlugin {
       .scal-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 2px 0;
+        gap: 1px 0; /* was 4px */
         width: 100%;
       }
       .scal-dow {
         text-align: center;
-        font-size: clamp(9px, 2.2cqw, 11px);
-        font-weight: 600;
+        font-size: clamp(11px, 3cqw, 13px);
+        font-weight: 700;
         color: var(--color-text-tertiary);
         letter-spacing: 0.05em;
-        padding-bottom: 6px;
+        padding-bottom: 3px; /* was 8px */
         text-transform: uppercase;
+        line-height: 1; /* added */
       }
       .scal-day {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: clamp(11px, 2.8cqw, 13px);
+        font-size: clamp(14px, 3.8cqw, 16px);
         color: var(--color-text-primary);
         aspect-ratio: 1;
         border-radius: 50%;
         cursor: pointer;
         transition: background 0.1s, color 0.1s;
-        line-height: 1;
+        line-height: 1; /* tighter */
         width: 100%;
+        padding: 0; /* added */
         box-sizing: border-box;
         text-decoration: none;
       }
@@ -159,7 +161,6 @@ class Plugin extends AppPlugin {
     const year = vd.getFullYear();
     const month = vd.getMonth();
 
-    // ── Header ───────────────────────────────────────────────────────────────
     const header = document.createElement("div");
     header.className = "scal-header";
 
@@ -190,7 +191,6 @@ class Plugin extends AppPlugin {
     header.appendChild(nextBtn);
     root.appendChild(header);
 
-    // ── Day-of-week row (Mon–Sun) ─────────────────────────────────────────────
     const grid = document.createElement("div");
     grid.className = "scal-grid";
 
@@ -201,26 +201,22 @@ class Plugin extends AppPlugin {
       grid.appendChild(cell);
     }
 
-    // ── Calendar cells ────────────────────────────────────────────────────────
-    // With Mon=0 offset: getDay() returns 0=Sun,1=Mon,...,6=Sat
-    // We want Mon as column 0, so offset = (getDay() + 6) % 7
     const firstDayRaw = new Date(year, month, 1).getDay();
-    const firstDay = (firstDayRaw + 6) % 7; // Mon-based offset (0=Mon, 6=Sun)
+    const firstDay = (firstDayRaw + 6) % 7;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const daysInPrevMonth = new Date(year, month, 0).getDate();
 
     const todayObj = new Date();
     const todayKey = `${todayObj.getFullYear()}-${todayObj.getMonth()}-${todayObj.getDate()}`;
 
-    // Leading cells from previous month
     for (let i = firstDay - 1; i >= 0; i--) {
       grid.appendChild(this._makeCell(daysInPrevMonth - i, month - 1, year, todayKey, true, container));
     }
-    // Current month
+
     for (let d = 1; d <= daysInMonth; d++) {
       grid.appendChild(this._makeCell(d, month, year, todayKey, false, container));
     }
-    // Trailing cells for next month
+
     const trailing = (firstDay + daysInMonth) % 7;
     const trailingCount = trailing === 0 ? 0 : 7 - trailing;
     for (let d = 1; d <= trailingCount; d++) {
@@ -240,12 +236,8 @@ class Plugin extends AppPlugin {
     if (isOtherMonth) cell.classList.add("other-month");
     if (key === todayKey) cell.classList.add("today");
     cell.textContent = rd;
-    cell.title = date.toLocaleDateString(undefined, {
-      weekday: "long", month: "long", day: "numeric", year: "numeric"
-    });
 
     cell.addEventListener("click", () => {
-      // Navigate to journal for this date; also jump month if clicking overflow day
       this._viewDate = new Date(ry, rm, 1);
       this._renderCalendar(container);
       this._openJournal(date);
