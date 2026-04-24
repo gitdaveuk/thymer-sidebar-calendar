@@ -1,4 +1,4 @@
-// Calendar widget for the Thymer sidebar
+// Compact Calendar widget for the Thymer sidebar
 
 class Plugin extends AppPlugin {
   onLoad() {
@@ -56,34 +56,37 @@ class Plugin extends AppPlugin {
     style.textContent = `
       .scal-root {
         font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
-        padding: 10px 8px 10px;
+        padding: 8px 8px 8px;
         user-select: none;
         width: 100%;
         box-sizing: border-box;
       }
+
       .scal-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 6px; /* was 12px */
+        margin-bottom: 6px;
         gap: 4px;
       }
+
       .scal-month-label {
         font-size: clamp(14px, 4cqw, 18px);
         font-weight: 700;
         color: var(--color-text-primary);
-        letter-spacing: 0.02em;
         text-align: center;
         flex: 1;
+        line-height: 1.1;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
+
       .scal-nav-btn {
         background: none;
         border: none;
         cursor: pointer;
-        padding: 4px 8px;
+        padding: 2px 6px;
         border-radius: 4px;
         color: var(--color-text-secondary);
         display: flex;
@@ -94,60 +97,63 @@ class Plugin extends AppPlugin {
         font-size: clamp(16px, 4cqw, 20px);
         transition: background 0.12s, color 0.12s;
       }
+
       .scal-nav-btn:hover {
         background: var(--color-background-secondary);
         color: var(--color-text-primary);
       }
-      .scal-nav-btn:active {
-        background: var(--color-background-tertiary);
-      }
+
       .scal-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 1px 0; /* was 4px */
+        gap: 1px 0;
         width: 100%;
       }
+
       .scal-dow {
         text-align: center;
         font-size: clamp(11px, 3cqw, 13px);
         font-weight: 700;
         color: var(--color-text-tertiary);
-        letter-spacing: 0.05em;
-        padding-bottom: 3px; /* was 8px */
+        padding-bottom: 3px;
         text-transform: uppercase;
-        line-height: 1; /* added */
+        line-height: 1;
       }
+
       .scal-day {
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: clamp(14px, 3.8cqw, 16px);
         color: var(--color-text-primary);
-        aspect-ratio: 1;
-        border-radius: 50%;
+        height: 28px;
+        border-radius: 6px;
         cursor: pointer;
         transition: background 0.1s, color 0.1s;
-        line-height: 1; /* tighter */
+        line-height: 1;
         width: 100%;
-        padding: 0; /* added */
+        padding: 0;
         box-sizing: border-box;
         text-decoration: none;
       }
+
       .scal-day:hover {
         background: var(--color-background-secondary);
       }
+
       .scal-day.other-month {
         color: var(--color-text-tertiary);
         opacity: 0.4;
       }
+
       .scal-day.today {
-        background: var(--color-text-primary);
-        color: var(--color-background-primary);
+        background: rgba(120, 120, 120, 0.18);
+        color: var(--color-text-primary);
         font-weight: 700;
-        box-shadow: 0 0 0 2px var(--color-text-primary), 0 0 0 4px var(--color-background-primary), 0 0 0 5px var(--color-text-primary);
       }
+
       .scal-day.today:hover {
-        opacity: 0.85;
+        background: rgba(120, 120, 120, 0.24);
       }
     `;
     container.appendChild(style);
@@ -175,7 +181,10 @@ class Plugin extends AppPlugin {
 
     const monthLabel = document.createElement("span");
     monthLabel.className = "scal-month-label";
-    monthLabel.textContent = vd.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+    monthLabel.textContent = vd.toLocaleDateString(undefined, {
+      month: "long",
+      year: "numeric"
+    });
 
     const nextBtn = document.createElement("button");
     nextBtn.className = "scal-nav-btn";
@@ -219,6 +228,7 @@ class Plugin extends AppPlugin {
 
     const trailing = (firstDay + daysInMonth) % 7;
     const trailingCount = trailing === 0 ? 0 : 7 - trailing;
+
     for (let d = 1; d <= trailingCount; d++) {
       grid.appendChild(this._makeCell(d, month + 1, year, todayKey, true, container));
     }
@@ -228,14 +238,25 @@ class Plugin extends AppPlugin {
 
   _makeCell(day, month, year, todayKey, isOtherMonth, container) {
     const date = new Date(year, month, day);
-    const ry = date.getFullYear(), rm = date.getMonth(), rd = date.getDate();
+    const ry = date.getFullYear();
+    const rm = date.getMonth();
+    const rd = date.getDate();
     const key = `${ry}-${rm}-${rd}`;
 
     const cell = document.createElement("div");
     cell.className = "scal-day";
+
     if (isOtherMonth) cell.classList.add("other-month");
     if (key === todayKey) cell.classList.add("today");
+
     cell.textContent = rd;
+
+    cell.title = date.toLocaleDateString(undefined, {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric"
+    });
 
     cell.addEventListener("click", () => {
       this._viewDate = new Date(ry, rm, 1);
